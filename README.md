@@ -1,10 +1,6 @@
 # Python-OCR
 extract text from images for linux
 
-
-
-[![Watch the video](https://img.youtube.com/vi/T-D1KVIuvjA/maxresdefault.jpg)](video.mp4)
-
 ### how to use
 
 ```sh
