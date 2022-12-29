@@ -15,7 +15,7 @@ def main():
 
     # ImgSrc = sys.argv[1] # command line
 
-    custom_config = r"-c preserve_interword_spaces=1 --oem 3 --psm 1 -l eng"
+    custom_config = r"-c preserve_interword_spaces=1 --oem 3 --psm 6 -l eng"
 
     d = pytesseract.image_to_data(
         Image.open(ImgSrc), config=custom_config, output_type=Output.DICT
@@ -59,6 +59,7 @@ def main():
 
     print(text)
     copy_to_clipboard(text)
+    os.system(f"notify-send 'Copied to clipboard.'")
 
 
 if __name__ == "__main__":
