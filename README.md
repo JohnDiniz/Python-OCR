@@ -18,7 +18,7 @@ python3 main.py
 pip install -r requirements.txt
 ```
 
-for arch
+On arch
 
 ```sh
 sudo pacman -S tesseract tesseract-ocr-eng maim
