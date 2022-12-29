@@ -1,6 +1,9 @@
 # Python-OCR
 extract text from images for linux
 
+<video src="https://media.tenor.com/videos/f4fffdd8b5dea9a4bacb6462140d6e91/mp4" controls="controls">
+</video>
+
 ### how to use
 
 ```sh
