@@ -9,7 +9,18 @@ import os
 
 def main():
 
-    os.system("maim -u -f png -s -b 2 /var/tmp/ocr.png")
+    result = subprocess.run(
+        ["maim", "-u", "-f", "png", "-s", "-b", "2", "/var/tmp/ocr.png"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    if result.returncode == 0:
+        print("The command was executed successfully.")
+    else:
+        os.system(f"notify-send 'Screenshot aborted.'")
+        print("The command failed.")
+        sys.exit(0)
 
     ImgSrc = "/var/tmp/ocr.png"
 
@@ -67,6 +78,7 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print("Interrupted")
+        os.system(f"notify-send 'Cancelled.'")
         try:
             sys.exit(0)
         except SystemExit:
