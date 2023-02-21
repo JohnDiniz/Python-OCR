@@ -21,7 +21,7 @@ pip install -r requirements.txt
 On arch
 
 ```sh
-sudo pacman -S tesseract tesseract-ocr-eng maim
+sudo yay -S tesseract tesseract-data-eng maim
 ```
 ### in sxhkdrc 
 
