@@ -1,48 +1,39 @@
-import pytesseract
-from pytesseract import Output
-from PIL import Image
-import pandas as pd
-import sys
-import subprocess
 import os
+import subprocess
+import pandas as pd
+import pytesseract
+from PIL import Image
+from pytesseract import Output
 
 
-def main():
-
+def capture_screenshot():
     result = subprocess.run(
         ["maim", "-u", "-f", "png", "-s", "-b", "2", "/var/tmp/ocr.png"],
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
     )
-
     if result.returncode == 0:
         print("The command was executed successfully.")
+        return "/var/tmp/ocr.png"
     else:
         os.system(f"notify-send 'Screenshot aborted.'")
         print("The command failed.")
-        sys.exit(0)
+        return None
 
-    ImgSrc = "/var/tmp/ocr.png"
 
-    # ImgSrc = sys.argv[1] # command line
-
+def extract_text_from_image(image_path):
     custom_config = r"-c preserve_interword_spaces=1 --oem 3 --psm 6 -l eng"
-
     d = pytesseract.image_to_data(
-        Image.open(ImgSrc), config=custom_config, output_type=Output.DICT
+        Image.open(image_path), config=custom_config, output_type=Output.DICT
     )
     df = pd.DataFrame(d)
 
-    def copy_to_clipboard(text):
-        process = subprocess.Popen(["xclip", "-selection", "c"], stdin=subprocess.PIPE)
-        process.communicate(input=text.encode())
-
-    text = ""
-
     # clean up blanks
     df1 = df[(df.conf != "-1") & (df.text != " ") & (df.text != "")]
+
     # sort blocks vertically
     sorted_blocks = df1.groupby("block_num").first().sort_values("top").index.tolist()
+
+    text = ""
     for block in sorted_blocks:
         curr = df1[df1["block_num"] == block]
         sel = curr[curr.text.str.len() > 3]
@@ -68,6 +59,17 @@ def main():
             prev_left += len(ln["text"]) + added + 1
         text += "\n"
 
+    return text.strip()
+
+
+def copy_to_clipboard(text):
+    process = subprocess.Popen(["xclip", "-selection", "c"], stdin=subprocess.PIPE)
+    process.communicate(input=text.encode())
+
+
+def main():
+    image_path = capture_screenshot()
+    text = extract_text_from_image(image_path)
     print(text)
     copy_to_clipboard(text)
     os.system(f"notify-send 'Copied to clipboard.'")
@@ -78,8 +80,4 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print("Interrupted")
-        os.system(f"notify-send 'Cancelled.'")
-        try:
-            sys.exit(0)
-        except SystemExit:
-            os._exit(0)
+        os.system("notify-send 'Cancelled.'")
